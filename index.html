@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>카카오페이 N빵 지원금 극대화 계산기</title>
+    <style>
+      :root {
+        --kakao-yellow: #fee500;
+        --kakao-brown: #3c1e1e;
+        --bg: #f7f7f8;
+        --card: #ffffff;
+        --text: #1a1a1a;
+        --muted: #6b7280;
+        --accent: #fee500;
+        --border: #e5e7eb;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+      }
+      body {
+        margin: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+          "Pretendard", "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        height: 100dvh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px;
+      }
+      .card {
+        background: var(--card);
+        border-radius: 16px;
+        padding: 20px 18px;
+        max-width: 420px;
+        width: 100%;
+        max-height: calc(100dvh - 24px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+        display: flex;
+        flex-direction: column;
+      }
+      h1 {
+        font-size: 18px;
+        margin: 0 0 4px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .emoji {
+        font-size: 20px;
+      }
+      .subtitle {
+        color: var(--muted);
+        font-size: 12px;
+        margin: 0 0 14px;
+        line-height: 1.4;
+      }
+      label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: #374151;
+      }
+      input[type="number"] {
+        width: 100%;
+        padding: 10px 12px;
+        font-size: 16px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        outline: none;
+        transition: border-color 0.15s;
+        -moz-appearance: textfield;
+      }
+      input[type="number"]::-webkit-outer-spin-button,
+      input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      input[type="number"]:focus {
+        border-color: var(--kakao-brown);
+      }
+      .field {
+        margin-bottom: 10px;
+      }
+      button {
+        width: 100%;
+        padding: 12px;
+        font-size: 15px;
+        font-weight: 700;
+        background: var(--kakao-yellow);
+        color: var(--kakao-brown);
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        margin-top: 4px;
+        transition:
+          transform 0.05s,
+          filter 0.15s;
+      }
+      button:hover {
+        filter: brightness(0.96);
+      }
+      button:active {
+        transform: translateY(1px);
+      }
+
+      .result {
+        margin-top: 14px;
+        padding: 14px 16px;
+        background: #fffbea;
+        border: 1px solid #fde68a;
+        border-radius: 12px;
+        display: none;
+      }
+      .result.show {
+        display: block;
+      }
+      .result .highlight {
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 2px;
+      }
+      .big-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      .result .big {
+        font-size: 26px;
+        font-weight: 800;
+        color: var(--kakao-brown);
+        line-height: 1.1;
+      }
+      .copy-btn {
+        flex-shrink: 0;
+        width: auto;
+        padding: 8px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        background: var(--kakao-brown);
+        color: var(--kakao-yellow);
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        margin: 0;
+        white-space: nowrap;
+        transition: filter 0.15s;
+      }
+      .copy-btn:hover {
+        filter: brightness(1.15);
+      }
+      .copy-btn.copied {
+        background: #16a34a;
+        color: #fff;
+      }
+      .row {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+        font-size: 13px;
+        border-top: 1px dashed #fde68a;
+      }
+      .row span:first-child {
+        color: var(--muted);
+      }
+      .row span:last-child {
+        font-weight: 600;
+      }
+      .kakao-bonus {
+        color: #16a34a;
+        font-weight: 800 !important;
+      }
+      .error {
+        color: #dc2626;
+        font-size: 12px;
+        margin-top: 6px;
+        min-height: 16px;
+      }
+      .footnote {
+        margin-top: 10px;
+        font-size: 10px;
+        color: var(--muted);
+        text-align: center;
+        line-height: 1.4;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1><span class="emoji">💸</span> 카카오페이 N빵 극대화기</h1>
+      <p class="subtitle">
+        실제 금액과 인원수를 넣으면, 카카오페이가 잔돈을 최대로 부담하도록
+        입력해야 할 금액을 계산해드립니다.
+      </p>
+
+      <div class="field">
+        <label for="amount">실제 금액 (원)</label>
+        <input id="amount" type="number" min="1" placeholder="예: 19000" />
+      </div>
+
+      <div class="field">
+        <label for="people">인원수 (명)</label>
+        <input
+          id="people"
+          type="number"
+          min="2"
+          max="1000"
+          placeholder="예: 3"
+        />
+      </div>
+
+      <button id="calcBtn">계산하기</button>
+      <div class="error" id="error"></div>
+
+      <div class="result" id="result">
+        <div class="highlight">카카오페이에 입력할 금액</div>
+        <div class="big-wrap">
+          <div class="big" id="inputAmount">-</div>
+          <button class="copy-btn" id="copyBtn" type="button">복사</button>
+        </div>
+
+        <div class="row">
+          <span>실제 금액</span>
+          <span id="realAmount">-</span>
+        </div>
+        <div class="row">
+          <span>추가할 금액</span>
+          <span id="addAmount">-</span>
+        </div>
+        <div class="row">
+          <span>1인당 청구액</span>
+          <span id="perPerson">-</span>
+        </div>
+        <div class="row">
+          <span>카카오페이 부담 💰</span>
+          <span id="kakaoPay" class="kakao-bonus">-</span>
+        </div>
+      </div>
+
+      <p class="footnote">
+        * 이 팁은 유머성 글에서 시작된 것으로, 1회 최대 이득은 (인원수 -
+        1)원입니다.
+      </p>
+    </div>
+
+    <script>
+      function calcKakaoPay(amount, people) {
+        const remainder = amount % people;
+        const add = (people - 1 - remainder + people) % people;
+        const inputAmount = amount + add;
+        const perPerson = Math.floor(inputAmount / people);
+        const kakaoPay = inputAmount % people;
+        return { amount, people, add, inputAmount, perPerson, kakaoPay };
+      }
+
+      const fmt = (n) => n.toLocaleString("ko-KR") + "원";
+
+      const amountEl = document.getElementById("amount");
+      const peopleEl = document.getElementById("people");
+      const errorEl = document.getElementById("error");
+      const resultEl = document.getElementById("result");
+      const copyBtn = document.getElementById("copyBtn");
+      let lastInputAmount = null;
+
+      function run() {
+        errorEl.textContent = "";
+        const amount = parseInt(amountEl.value, 10);
+        const people = parseInt(peopleEl.value, 10);
+
+        if (!Number.isFinite(amount) || amount <= 0) {
+          errorEl.textContent = "올바른 금액을 입력해주세요.";
+          resultEl.classList.remove("show");
+          return;
+        }
+        if (!Number.isFinite(people) || people < 2) {
+          errorEl.textContent = "인원수는 2명 이상이어야 합니다.";
+          resultEl.classList.remove("show");
+          return;
+        }
+        if (people > 1000) {
+          errorEl.textContent = "인원수가 너무 많습니다 (최대 1,000명).";
+          resultEl.classList.remove("show");
+          return;
+        }
+        if (amount < people) {
+          errorEl.textContent = `금액(${fmt(amount)})이 인원수(${people}명)보다 작습니다. 이러면 N빵이 성립 안 해요 😅`;
+          resultEl.classList.remove("show");
+          return;
+        }
+
+        const r = calcKakaoPay(amount, people);
+        lastInputAmount = r.inputAmount;
+        document.getElementById("inputAmount").textContent = fmt(r.inputAmount);
+        document.getElementById("realAmount").textContent = fmt(r.amount);
+        document.getElementById("addAmount").textContent =
+          r.add === 0 ? "0원 (이미 최적)" : "+" + fmt(r.add);
+        document.getElementById("perPerson").textContent = fmt(r.perPerson);
+        document.getElementById("kakaoPay").textContent = "+" + fmt(r.kakaoPay);
+        copyBtn.textContent = "복사";
+        copyBtn.classList.remove("copied");
+        resultEl.classList.add("show");
+      }
+
+      async function copyAmount() {
+        if (lastInputAmount == null) return;
+        const text = String(lastInputAmount);
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(text);
+          } else {
+            const ta = document.createElement("textarea");
+            ta.value = text;
+            ta.style.position = "fixed";
+            ta.style.opacity = "0";
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand("copy");
+            document.body.removeChild(ta);
+          }
+          copyBtn.textContent = "복사됨 ✓";
+          copyBtn.classList.add("copied");
+          setTimeout(() => {
+            copyBtn.textContent = "복사";
+            copyBtn.classList.remove("copied");
+          }, 1500);
+        } catch (e) {
+          copyBtn.textContent = "실패";
+          setTimeout(() => {
+            copyBtn.textContent = "복사";
+          }, 1500);
+        }
+      }
+
+      document.getElementById("calcBtn").addEventListener("click", run);
+      copyBtn.addEventListener("click", copyAmount);
+      [amountEl, peopleEl].forEach((el) =>
+        el.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") run();
+        }),
+      );
+    </script>
+  </body>
+</html>

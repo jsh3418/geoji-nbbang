@@ -1,0 +1,13 @@
+{
+  "name": "geoji-nbbang",
+  "version": "1.0.0",
+  "description": "N빵 지원금 극대화 계산기",
+  "private": true,
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}

@@ -249,21 +249,18 @@
       </div>
 
       <p class="footnote">
-        * 이 팁은 유머성 글에서 시작된 것으로, 1회 최대 이득은 (인원수 -
-        1)원입니다.
+        * 이 팁은
+        <a
+          href="https://x.com/sepiroot/status/1445586800605478913"
+          target="_blank"
+          rel="noopener noreferrer"
+          >유머성 글</a
+        >에서 시작된 것으로, 1회 최대 이득은 (인원수 - 1)원입니다.
       </p>
     </div>
 
+    <script src="./calc.js"></script>
     <script>
-      function calcKakaoPay(amount, people) {
-        const remainder = amount % people;
-        const add = (people - 1 - remainder + people) % people;
-        const inputAmount = amount + add;
-        const perPerson = Math.floor(inputAmount / people);
-        const kakaoPay = inputAmount % people;
-        return { amount, people, add, inputAmount, perPerson, kakaoPay };
-      }
-
       const fmt = (n) => n.toLocaleString("ko-KR") + "원";
 
       const amountEl = document.getElementById("amount");
